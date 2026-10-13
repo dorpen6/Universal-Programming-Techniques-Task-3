@@ -17,29 +17,26 @@ public class MyFrame extends Frame {
 
     public MyFrame() {
 
-        // Create the panels
+        // Create panels
         ballPanel = new BallPanel();
         buttonPanel = new Panel();
 
-        // Create the buttons
+        // Create buttons
         addBall = new Button("Add Ball");
         shakePanel = new Button("Shake Balls");
 
-        // Set layout for the button panel
+        // Add buttons to bottom panel
         buttonPanel.setLayout(new FlowLayout());
-
-        // Add buttons to the button panel
         buttonPanel.add(addBall);
         buttonPanel.add(shakePanel);
 
-        // Set layout for the main window
+        // Main window layout
         setLayout(new BorderLayout());
 
-        // Add panels to the window
         add(ballPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Set colors
+        // Colors
         ballPanel.setBackground(Color.YELLOW);
         buttonPanel.setBackground(Color.GREEN);
 
@@ -53,7 +50,7 @@ public class MyFrame extends Frame {
         setSize(500, 500);
         setVisible(true);
 
-        // Close the program when the window is closed
+        // Close program when window is closed
         addWindowListener(new WindowAdapter() {
 
             @Override

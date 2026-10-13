@@ -11,20 +11,18 @@ public class BallPanel extends Panel implements Runnable, ActionListener {
 
     public BallPanel() {
 
-        // Create an empty list for the balls
+        // Create an empty list for balls
         ballList = new ArrayList<>();
 
-        // Create a thread for repainting the panel
+        // Thread used to repaint the panel
         Thread panelThread = new Thread(this);
-
-        // Start the thread
         panelThread.start();
     }
 
     @Override
     public void paint(Graphics graphics) {
 
-        // Draw every ball from the list
+        // Draw every ball
         for (Ball ball : ballList) {
             ball.draw(graphics);
         }
@@ -35,13 +33,15 @@ public class BallPanel extends Panel implements Runnable, ActionListener {
 
         while (true) {
 
-            // Redraw the panel
             repaint();
 
             try {
-                // About 30 frames per second
+
+                // About 30 FPS
                 Thread.sleep(33);
+
             } catch (InterruptedException exception) {
+
                 exception.printStackTrace();
             }
         }
@@ -50,7 +50,7 @@ public class BallPanel extends Panel implements Runnable, ActionListener {
     @Override
     public void actionPerformed(ActionEvent event) {
 
-        // Find the center of the panel
+        // Center of the panel
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
 
@@ -60,8 +60,11 @@ public class BallPanel extends Panel implements Runnable, ActionListener {
             @Override
             public boolean collidingX() {
 
-                boolean touchesLeftSide = x + vx - 5 < 0;
-                boolean touchesRightSide = x + vx + 5 > getWidth();
+                boolean touchesLeftSide =
+                        x + vx - 5 < 0;
+
+                boolean touchesRightSide =
+                        x + vx + 5 > getWidth();
 
                 return touchesLeftSide || touchesRightSide;
             }
@@ -69,8 +72,11 @@ public class BallPanel extends Panel implements Runnable, ActionListener {
             @Override
             public boolean collidingY() {
 
-                boolean touchesTop = y + vy - 5 < 0;
-                boolean touchesBottom = y + vy + 5 > getHeight();
+                boolean touchesTop =
+                        y + vy - 5 < 0;
+
+                boolean touchesBottom =
+                        y + vy + 5 > getHeight();
 
                 return touchesTop || touchesBottom;
             }
@@ -82,9 +88,11 @@ public class BallPanel extends Panel implements Runnable, ActionListener {
 
     public void shake() {
 
-        // Wake every ball
-        for (Ball ball : ballList) {
-            ball.wakeUp();
+        // Use the same shared monitor as every Ball
+        synchronized (Ball.MONITOR) {
+
+            // Wake all waiting balls
+            Ball.MONITOR.notifyAll();
         }
     }
 }

@@ -2,6 +2,9 @@ import java.awt.Graphics;
 
 public abstract class Ball implements Runnable {
 
+    // One shared object for ALL balls
+    public static final Object MONITOR = new Object();
+
     protected int x;
     protected int y;
 
@@ -14,23 +17,19 @@ public abstract class Ball implements Runnable {
 
     public Ball(int x, int y) {
 
-        // Save starting position
+        // Starting position
         this.x = x;
         this.y = y;
 
-        // Random horizontal movement from -3 to 3
+        // Random movement direction
         vx = (int) (Math.random() * 7) - 3;
-
-        // Random vertical movement from -3 to 3
         vy = (int) (Math.random() * 7) - 3;
 
-        // Random delay between 20 and 30 milliseconds
+        // Random speed
         speed = 20 + (int) (Math.random() * 11);
 
-        // Create a thread for this ball
+        // Create and start the thread
         thread = new Thread(this);
-
-        // Start moving the ball
         thread.start();
     }
 
@@ -48,61 +47,48 @@ public abstract class Ball implements Runnable {
 
     public abstract boolean collidingY();
 
-    public void wakeUp() {
-
-        synchronized (thread) {
-
-            // Wake waiting threads
-            thread.notifyAll();
-        }
-    }
-
     @Override
     public void run() {
 
         while (true) {
 
-            // Move horizontally
+            // Move the ball
             x = x + vx;
-
-            // Move vertically
             y = y + vy;
 
             try {
 
-                // Check left/right wall
+                // Collision with left or right wall
                 if (collidingX()) {
 
                     // Reverse horizontal direction
                     vx = vx * -1;
 
-                    // Move one step in the new direction
+                    // Move slightly back inside the panel
                     x = x + vx;
 
-                    synchronized (thread) {
-
-                        // Stop this ball until it is awakened
-                        thread.wait();
+                    // Wait using the shared MONITOR
+                    synchronized (MONITOR) {
+                        MONITOR.wait();
                     }
                 }
 
-                // Check top/bottom wall
+                // Collision with top or bottom wall
                 if (collidingY()) {
 
                     // Reverse vertical direction
                     vy = vy * -1;
 
-                    // Move one step in the new direction
+                    // Move slightly back inside the panel
                     y = y + vy;
 
-                    synchronized (thread) {
-
-                        // Stop this ball until it is awakened
-                        thread.wait();
+                    // Wait using the shared MONITOR
+                    synchronized (MONITOR) {
+                        MONITOR.wait();
                     }
                 }
 
-                // Wait before moving again
+                // Small pause before next movement
                 Thread.sleep(speed);
 
             } catch (InterruptedException exception) {
